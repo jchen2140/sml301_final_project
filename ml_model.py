@@ -10,18 +10,59 @@ from torch.utils.data import Dataset, DataLoader
 
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import os
 
 MAX_WORDS = 10000
 MAX_LEN = 200
 EMBEDDING_DIM = 100
-BATCH_SIZE = 32
-EPOCHS = 10
+BATCH_SIZE = 16
+EPOCHS = 20
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+GLOVE_FILE = "/u/jc3496/sml301_final_project-1/glove.6B.100d.txt"
+LEARNING_RATE = 1e-3
+CLASS_LOSS_WEIGHT = 0.6
+REG_LOSS_WEIGHT = 0.4
 
 def load_data(filepath):
     df = pd.read_csv(filepath)
     df.dropna(subset=["cleaned_text"], inplace=True)
     return df
+
+def load_glove_embeddings(glove_file, tokenizer, embedding_dim, max_words):
+    """
+    Load GloVe embeddings and create embedding matrix for tokenizer vocabulary.
+    Returns numpy array of shape (max_words, embedding_dim).
+    """
+    embedding_matrix = np.random.randn(max_words, embedding_dim).astype(np.float32) * 0.01
+    
+    if not os.path.exists(glove_file):
+        print(f"GloVe file not found at {glove_file}. Using random initialization.")
+        return embedding_matrix
+    
+    print(f"Loading GloVe embeddings from {glove_file}...")
+    embeddings_index = {}
+    word_count = 0
+    with open(glove_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            values = line.split()
+            word = values[0]
+            coefs = np.asarray(values[1:], dtype='float32')
+            embeddings_index[word] = coefs
+            word_count += 1
+            if word_count % 100000 == 0:
+                print(f"  Loaded {word_count} words from GloVe...")
+    
+    # populate embedding matrix using tokenizer word index
+    matched_count = 0
+    for word, idx in tokenizer.word_index.items():
+        if idx < max_words:
+            embedding_vector = embeddings_index.get(word)
+            if embedding_vector is not None:
+                embedding_matrix[idx] = embedding_vector
+                matched_count += 1
+    
+    print(f"Loaded {len(embeddings_index)} GloVe words. Matched {matched_count} words in vocab.")
+    return embedding_matrix
 
 class ReviewDataset(Dataset):
     def __init__(self, X, y_class, y_reg):
@@ -87,8 +128,10 @@ def predict_review(model, tokenizer, review_text):
     return pred_rating, category, pred_class + 1
 
 if __name__ == "__main__":
+    print("Starting model training with GloVe embeddings...")
     filepath = "/u/jc3496/sml301_final_project-1/yelp_cleaned_reviews_1000.csv"
     df = load_data(filepath)
+    print(f"Loaded {len(df)} reviews")
 
     # classification (4 classes)
     y_class = df["stars"].apply(lambda x: 0 if x<3 else 1 if x==3 else 2 if x==4 else 3).values
@@ -108,8 +151,8 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE)
 
-    # load GloVe embeddings here later
-    pretrained_weights = None  # could load a (MAX_WORDS, EMBEDDING_DIM) numpy array
+    # load GloVe embeddings
+    pretrained_weights = load_glove_embeddings(GLOVE_FILE, tokenizer, EMBEDDING_DIM, MAX_WORDS)
 
     model = MultiKernelCNN(MAX_WORDS, EMBEDDING_DIM, pretrained_weights).to(DEVICE)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
