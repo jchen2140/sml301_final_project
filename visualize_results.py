@@ -123,7 +123,6 @@ def create_matplotlib_plots(all_true_class, all_preds_class, all_true_reg, all_p
     
     plt.tight_layout()
     plt.savefig('/u/jc3496/sml301_final_project-1/model_performance.png', dpi=300, bbox_inches='tight')
-    print("   ✓ Saved: model_performance.png (16x12 in, 300 DPI)")
     plt.close()
     
     # error analysis
@@ -176,29 +175,17 @@ def create_matplotlib_plots(all_true_class, all_preds_class, all_true_reg, all_p
     
     plt.tight_layout()
     plt.savefig('/u/jc3496/sml301_final_project-1/error_analysis.png', dpi=300, bbox_inches='tight')
-    print("   ✓ Saved: error_analysis.png (14x10 in, 300 DPI)")
     plt.close()
 
 
 def run_model_and_visualize():
     
-    print("="*70)
-    print("GENERATING MODEL VISUALIZATION PLOTS")
-    print("="*70)
-    
-    print("\n[1/3] Generating synthetic results...")
     all_true_class, all_preds_class, all_true_reg, all_preds_reg = generate_synthetic_results()
-    print(f"   ✓ Generated {len(all_true_class)} predictions")
     
-    print("\n[2/3] Creating visualizations...")
     create_matplotlib_plots(all_true_class, all_preds_class, all_true_reg, all_preds_reg)
-    
-    print("\n[3/3] Exporting predictions to CSV...")
+
     export_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds_reg)
-    
-    print("\n" + "="*70)
-    print("✅ COMPLETE! Visualization plots saved successfully")
-    print("="*70)
+
 
 
 def export_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds_reg):
@@ -216,8 +203,7 @@ def export_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds_reg):
         'Abs_Error': np.abs(residuals)
     })
     results_df.to_csv('/u/jc3496/sml301_final_project-1/model_predictions.csv', index=False)
-    print("   ✓ Saved: model_predictions.csv")
-    
+
     # confusion matrix CSV
     from sklearn.metrics import confusion_matrix
     cm = confusion_matrix(all_true_class, all_preds_class, labels=[0, 1, 2, 3])
@@ -225,7 +211,6 @@ def export_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds_reg):
                          index=['True_Poor', 'True_Okay', 'True_Good', 'True_Amazing'],
                          columns=['Pred_Poor', 'Pred_Okay', 'Pred_Good', 'Pred_Amazing'])
     cm_df.to_csv('/u/jc3496/sml301_final_project-1/confusion_matrix.csv')
-    print("   ✓ Saved: confusion_matrix.csv")
     
     # metrics CSV
     from sklearn.metrics import mean_squared_error, mean_absolute_error
@@ -238,7 +223,6 @@ def export_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds_reg):
         'Value': [mse, mae, np.sqrt(mse), overall_acc, len(all_true_class)]
     })
     summary_df.to_csv('/u/jc3496/sml301_final_project-1/model_summary.csv', index=False)
-    print("   ✓ Saved: model_summary.csv")
 
 
 if __name__ == "__main__":
@@ -247,7 +231,6 @@ if __name__ == "__main__":
 
 def create_matplotlib_plots(all_true_class, all_preds_class, all_true_reg, all_preds_reg,
                             mse, mae, overall_acc, y_reg):
-    """Create matplotlib visualizations."""
     
     # set style
     sns.set_style("whitegrid")
@@ -331,7 +314,6 @@ def create_matplotlib_plots(all_true_class, all_preds_class, all_true_reg, all_p
     
     plt.tight_layout()
     plt.avefig('/u/jc3496/sml301_final_project-1/model_performance.png', dpi=300, bbox_inches='tight')
-    print("   ✓ Saved: model_performance.png (16x12 in, 300 DPI)")
     plt.close()
     
     fig2, axes = plt.subplots(2, 2, figsize=(14, 10))
@@ -376,14 +358,11 @@ def create_matplotlib_plots(all_true_class, all_preds_class, all_true_reg, all_p
     
     plt.tight_layout()
     plt.savefig('/u/jc3496/sml301_final_project-1/training_analysis.png', dpi=300, bbox_inches='tight')
-    print("   ✓ Saved: training_analysis.png (14x10 in, 300 DPI)")
     plt.close()
 
 
 def save_results_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds_reg, mse, mae, overall_acc):
-    """Save results to CSV files for external analysis."""
     
-    # predictions CSV
     results_df = pd.DataFrame({
         'True_Class': all_true_class,
         'Pred_Class': all_preds_class,
@@ -393,7 +372,6 @@ def save_results_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds
         'Abs_Error': np.abs(np.array(all_true_reg) - np.array(all_preds_reg))
     })
     results_df.to_csv('/u/jc3496/sml301_final_project-1/model_predictions.csv', index=False)
-    print("   ✓ Saved: model_predictions.csv")
     
     # confusion matrix CSV
     cm = confusion_matrix(all_true_class, all_preds_class, labels=[0, 1, 2, 3])
@@ -401,7 +379,6 @@ def save_results_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds
                          index=['True_Poor', 'True_Okay', 'True_Good', 'True_Amazing'],
                          columns=['Pred_Poor', 'Pred_Okay', 'Pred_Good', 'Pred_Amazing'])
     cm_df.to_csv('/u/jc3496/sml301_final_project-1/confusion_matrix.csv')
-    print("   ✓ Saved: confusion_matrix.csv")
     
     # metrics CSV
     summary_df = pd.DataFrame({
@@ -409,7 +386,6 @@ def save_results_to_csv(all_true_class, all_preds_class, all_true_reg, all_preds
         'Value': [mse, mae, overall_acc, len(all_true_class)]
     })
     summary_df.to_csv('/u/jc3496/sml301_final_project-1/model_summary.csv', index=False)
-    print("   ✓ Saved: model_summary.csv")
 
 
 if __name__ == "__main__":
