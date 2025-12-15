@@ -413,7 +413,6 @@ def main():
 
     plt.tight_layout()
     plt.savefig('ml_vs_nn_detailed.png', dpi=300, bbox_inches='tight')
-    print("Saved: ml_vs_nn_detailed.png")
     plt.close()
 
     print("\n" + "=" * 90)
