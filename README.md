@@ -2,6 +2,8 @@
 
 A multi-task deep learning project for sentiment analysis of Yelp business reviews, combining classification and regression in a single neural network architecture.
 
+By: Jessie, Humnah, Sarina
+
 ## Project Overview
 
 This project implements a **Multi-Kernel Convolutional Neural Network (CNN)** that performs two simultaneous tasks:
