@@ -369,7 +369,6 @@ def main():
     ax.text(8, 7.8, 'Converts logits to probabilities that sum to 1', fontsize=10)
 
     plt.savefig('softmax_pipeline_real.png', dpi=300, bbox_inches='tight')
-    print("   ✓ Saved: softmax_pipeline_real.png")
     plt.close()
 
     print("\n" + "=" * 70)
